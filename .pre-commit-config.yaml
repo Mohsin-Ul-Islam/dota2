@@ -14,7 +14,7 @@ repos:
         stages: [push]
         name: Pants -> lint check test
         entry: |
-          ./pants --changed-since=HEAD lint check test --use-coverage ::
+          ./pants lint check test --use-coverage ::
         language: system
         pass_filenames: false
         always_run: true
