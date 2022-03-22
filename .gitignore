@@ -3,3 +3,26 @@
 /dist/
 /.pids
 /.pants.workdir.file_lock*
+
+# python object files and caches
+__pycache__/
+*.pyo
+*.pyc
+.pytest_cache
+
+# distributions
+dist/
+
+# poetry's in-project virtual environments
+.venv/
+
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Mac OS DS
+.DS_Store
