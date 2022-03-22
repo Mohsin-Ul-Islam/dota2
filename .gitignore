@@ -26,3 +26,6 @@ dist/
 
 # Mac OS DS
 .DS_Store
+
+# pyenv config files
+.python-version
