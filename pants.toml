@@ -1,0 +1,38 @@
+[GLOBAL]
+pants_version = "2.9.0"
+
+backend_packages = [
+  "pants.backend.python",
+  "pants.backend.python.lint.bandit",
+  "pants.backend.python.lint.black",
+  "pants.backend.python.lint.isort",
+  "pants.backend.python.lint.flake8",
+  "pants.backend.python.lint.pylint",
+  "pants.backend.python.lint.docformatter",
+  "pants.backend.python.typecheck.mypy",
+  "pants.backend.experimental.python.lint.autoflake",
+]
+
+[python]
+interpreter_constraints = ["CPython>=3.10"]
+requirement_constraints = "third_party/python/constraints.txt"
+
+[anonymous-telemetry]
+enabled = false
+
+[pylint]
+config = "build_support/lint/.pylintrc"
+
+[mypy]
+config = "build_support/typing/mypy.ini"
+
+[flake8]
+config = "build_support/fmt/.flake8"
+
+[isort]
+args = ["--profile", "black"]
+config = "build_support/fmt/.isort.cfg"
+
+[coverage-py]
+fail_under = 100
+config = "build_support/test/.coveragerc"
