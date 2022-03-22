@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "pip"
+    directory: "/third_party/python"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 7
+    target-branch: "main"
