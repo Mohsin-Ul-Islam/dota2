@@ -1,0 +1,52 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Cache Pants
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/pants/setup
+            ~/.cache/pants/lmdb_store
+            ~/.cache/pants/named_caches
+          key: ${{ runner.os }}-pants-cache
+
+      - name: Install Python 3.10.3
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.3
+
+      - name: Pants check tailor
+        run: |
+          ./pants tailor --check
+
+      - name: Pants check build files
+        run: |
+          ./pants update-build-files --check
+
+      - name: Pants Lint
+        run: |
+          ./pants lint ::
+
+      - name: Pants Typecheck
+        run: |
+          ./pants check ::
+
+      - name: Pants Test
+        run: |
+          ./pants test --use-coverage ::
