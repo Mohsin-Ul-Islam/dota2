@@ -1,0 +1,20 @@
+fail_fast: true
+repos:
+  - repo: local
+    hooks:
+      - id: cz
+        stages: [commit-msg]
+        name: Check Commit Message
+        entry: cz check --commit-msg-file
+        language: system
+        pass_filenames: true
+        always_run: true
+
+      - id: pants
+        stages: [push]
+        name: Pants -> lint check test
+        entry: |
+          ./pants lint check test --use-coverage ::
+        language: system
+        pass_filenames: false
+        always_run: true
