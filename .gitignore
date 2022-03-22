@@ -23,9 +23,13 @@ dist/
 *.njsproj
 *.sln
 *.sw?
+.vscode
 
 # Mac OS DS
 .DS_Store
 
 # pyenv config files
 .python-version
+
+# environment files
+.env
