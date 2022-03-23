@@ -17,6 +17,7 @@ class Damage:
 
         PHYSICAL = 0
         MAGICAL = 1
+        PURE = 2
 
     value: float
     type_: Type
@@ -24,11 +25,14 @@ class Damage:
     @property
     def is_magical(self) -> bool:
         """Is the damage instance magical?"""
-
         return self.type_ == Damage.Type.MAGICAL
 
     @property
     def is_physical(self) -> bool:
         """Is the damage instance physical?"""
-
         return self.type_ == Damage.Type.PHYSICAL
+
+    @property
+    def is_pure(self) -> bool:
+        """Is the damage instance pure?"""
+        return self.type_ == Damage.Type.PURE

@@ -15,3 +15,9 @@ def magical_damage() -> Damage:
 def physical_damage() -> Damage:
     """Fixture to return default physical damage instance."""
     return Damage(35.17, Damage.Type.PHYSICAL)
+
+
+@fixture(scope="function")
+def pure_damage() -> Damage:
+    """Fixture to return default pure damage instance."""
+    return Damage(110.02, Damage.Type.PURE)
