@@ -1,15 +1,8 @@
-"""Test suite for dota2."""
+"""Test suite for `Damage`."""
 
-from expects import be, equal, expect
+from expects import be, expect
 
-from dota2 import __version__
 from dota2.domain.models import Damage
-
-
-def test_version():
-    """Assert that the package version is correct."""
-
-    expect(__version__).to(equal("0.1.0"))
 
 
 def test_is_magical(

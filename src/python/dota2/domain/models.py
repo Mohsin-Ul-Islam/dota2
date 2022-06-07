@@ -12,7 +12,7 @@ class Damage:
     class Type(Enum):
         """Damage instance type.
 
-        Can be one of PHYSICAL or Magical
+        Can be one of `Physical`, `Magical` or `Pure`.
         """
 
         PHYSICAL = 0
@@ -36,3 +36,14 @@ class Damage:
     def is_pure(self) -> bool:
         """Is the damage instance pure?"""
         return self.type_ == Damage.Type.PURE
+
+
+@dataclass
+class Attackable:
+    """An object that can be attacked."""
+
+    health: float
+
+    def deal(self, damage: Damage) -> None:
+        """Deal damage to the attackable."""
+        self.health = max(0, self.health - damage.value)
