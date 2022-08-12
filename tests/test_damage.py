@@ -2,7 +2,7 @@
 
 from expects import be, expect
 
-from dota2.domain.models import Damage
+from dota2.damage import Damage
 
 
 def test_is_magical(

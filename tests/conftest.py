@@ -2,7 +2,7 @@
 
 from pytest import fixture
 
-from dota2.domain.models import Damage
+from dota2.damage import Damage
 
 
 @fixture(scope="function")

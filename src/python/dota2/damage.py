@@ -1,6 +1,3 @@
-"""Domain models for dota2."""
-from __future__ import annotations
-
 from dataclasses import dataclass
 from enum import Enum
 
@@ -36,14 +33,3 @@ class Damage:
     def is_pure(self) -> bool:
         """Is the damage instance pure?"""
         return self.type_ == Damage.Type.PURE
-
-
-@dataclass
-class Attackable:
-    """An object that can be attacked."""
-
-    health: float
-
-    def deal(self, damage: Damage) -> None:
-        """Deal damage to the attackable."""
-        self.health = max(0, self.health - damage.value)

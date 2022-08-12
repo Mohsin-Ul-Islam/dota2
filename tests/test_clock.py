@@ -12,13 +12,13 @@ def test_clock_elapsed() -> None:
     expect(clock.elapsed()).to(be(0))
 
 
-def test_clock_forward() -> None:
-    """Clock can be forwarded by n seconds."""
+def test_clock_advance() -> None:
+    """Clock can be advanceed by n seconds."""
 
     clock = MockClock()
     expect(clock.elapsed()).to(be(0))
 
-    clock.forward(seconds=4)
+    clock.advance(seconds=4)
     expect(clock.elapsed()).to(be(4))
 
 
@@ -28,7 +28,7 @@ def test_clock_reset() -> None:
     clock = MockClock()
     expect(clock.elapsed()).to(be(0))
 
-    clock.forward(seconds=4)
+    clock.advance(seconds=4)
     expect(clock.elapsed()).to(be(4))
 
     clock.reset()
