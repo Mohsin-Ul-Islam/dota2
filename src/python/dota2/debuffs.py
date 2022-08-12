@@ -6,7 +6,7 @@ from dota2.mixins import Attackable, Movable, Tickable
 
 
 @dataclass
-class TimedDebuf(Tickable):
+class TimedDebuff(Tickable):
 
     duration: float
     duration_left: float = field(init=False)
@@ -38,7 +38,7 @@ class TimedDebuf(Tickable):
 
 
 @dataclass
-class SpiritVesselDebuf(TimedDebuf):
+class SpiritVesselDebuff(TimedDebuff):
 
     target: Attackable
     _health_regen_change: float = field(init=False, default=0)
@@ -57,7 +57,7 @@ class SpiritVesselDebuf(TimedDebuf):
 
 
 @dataclass
-class BlighStoneDebuf(TimedDebuf):
+class BlighStoneDebuff(TimedDebuff):
 
     target: Attackable
     _armour_change: float = field(init=False, default=2)
@@ -73,7 +73,7 @@ class BlighStoneDebuf(TimedDebuf):
 
 
 @dataclass
-class OrbOfVenomDebuf(TimedDebuf):
+class OrbOfVenomDebuff(TimedDebuff):
 
     target: Movable
     _move_speed_change: float = field(init=False)
