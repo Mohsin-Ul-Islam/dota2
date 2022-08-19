@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 
 from dota2.clock import Clock
 from dota2.mixins import Attackable, Movable, Tickable
+from dota2.utils import logger
 
 
 @dataclass
@@ -30,11 +31,14 @@ class TimedDebuff(Tickable):
 
     def tick(self, clock: Clock) -> None:
 
-        if self.duration_left <= 0:
+        self.duration_left -= clock.elapsed()
+        if self.is_expired():
             return self.before_end()
 
         self.on_tick()
-        self.duration_left -= clock.elapsed()
+
+    def is_expired(self) -> bool:
+        return self.duration_left <= 0
 
 
 @dataclass
@@ -44,9 +48,11 @@ class SpiritVesselDebuff(TimedDebuff):
     _health_regen_change: float = field(init=False, default=0)
 
     def before_start(self) -> None:
+        logger.debug(f"Applied spirit vessel on {id(self.target)} for {self.duration}s")
         self.on_tick()
 
     def before_end(self) -> None:
+        logger.debug(f"Spirit vessel ends on {id(self.target)} after {self.duration}s")
         self.target.effective_health_regen_rate += self._health_regen_change
 
     def on_tick(self) -> None:
@@ -63,9 +69,11 @@ class BlighStoneDebuff(TimedDebuff):
     _armour_change: float = field(init=False, default=2)
 
     def before_start(self) -> None:
+        logger.debug(f"Applied blight stone to {id(self.target)} for {self.duration}s")
         self.target.armour -= self._armour_change
 
     def before_end(self) -> None:
+        logger.debug(f"Blight stone ends on {id(self.target)} after {self.duration}s")
         self.target.armour += self._armour_change
 
     def on_tick(self) -> None:

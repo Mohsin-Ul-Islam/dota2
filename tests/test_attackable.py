@@ -1,20 +1,65 @@
 """Test suite for `Attackable`"""
 
 from expects import equal, expect
+from pytest import raises
 
 from dota2.clock import MockClock
 from dota2.damage import Damage
 from dota2.mixins import Attackable
 
 
+def test_attackable_health_init():
+    """Attackable's health cannot be negative or greater than pool."""
+
+    with raises(ValueError, match="health cannot be negative"):
+        Attackable(
+            armour=1,
+            health=-80,
+            health_pool=640,
+            health_regeneration_rate=2,
+        )
+
+    with raises(ValueError, match="health cannot be greater than health_pool"):
+        Attackable(
+            armour=1,
+            health=700,
+            health_pool=640,
+            health_regeneration_rate=2,
+        )
+
+
+def test_attackable_health_pool_init():
+    """Attackable's health_pool cannot be negative."""
+
+    with raises(ValueError, match="health_pool cannot be negative"):
+        Attackable(
+            armour=1,
+            health=80,
+            health_pool=-640,
+            health_regeneration_rate=2,
+        )
+
+
+def test_attackable_health_regen_rate_init():
+    """Attackable's health_regeneration_rate cannot be negative."""
+
+    with raises(ValueError, match="health_regeneration_rate cannot be negative"):
+        Attackable(
+            armour=1,
+            health=80,
+            health_pool=640,
+            health_regeneration_rate=-2,
+        )
+
+
 def test_can_deal_damage_to_attackable(physical_damage: Damage):
     """Attackable's health can be reduced by damage instance."""
 
     tier_one_tower = Attackable(
+        armour=1,
         health=1120.75,
         health_pool=1500,
         health_regeneration_rate=3.75,
-        armour=1,
     )
     physical_damage.value = 120
 
@@ -27,10 +72,10 @@ def test_attackable_health_cannot_get_negative(physical_damage: Damage):
     """Attackable's health can max go to zero."""
 
     tier_one_tower = Attackable(
+        armour=1,
         health=1120.75,
         health_pool=1500,
         health_regeneration_rate=3.75,
-        armour=1,
     )
     physical_damage.value = 1500
 
@@ -44,10 +89,10 @@ def test_attackable_health_regeneration():
 
     clock = MockClock()
     dragon_knight = Attackable(
+        armour=1,
         health=760,
         health_pool=1500,
         health_regeneration_rate=4,
-        armour=1,
     )
 
     dragon_knight.tick(clock=clock)
@@ -64,10 +109,10 @@ def test_attackable_max_health_regeneration():
 
     clock = MockClock()
     dragon_knight = Attackable(
+        armour=1,
         health=1490,
         health_pool=1500,
         health_regeneration_rate=4,
-        armour=1,
     )
 
     dragon_knight.tick(clock=clock)
