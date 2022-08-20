@@ -1,21 +1,9 @@
-from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 
+from dota2.base import Tickable
 from dota2.clock import Clock
 from dota2.damage import Damage
 from dota2.utils import Point3D, logger
-
-
-class Tickable(ABC):
-    @abstractmethod
-    def tick(self, clock: Clock) -> None:
-        raise NotImplementedError()
-
-
-class Drawable(ABC):
-    @abstractmethod
-    def draw(self) -> None:
-        raise NotImplementedError()
 
 
 @dataclass
@@ -112,20 +100,3 @@ class SpellCaster(Tickable):
             self.mana_pool,
             self.mana + clock.elapsed() * self.mana_regeneration_rate,
         )
-
-
-@dataclass
-class Hero(Attackable, SpellCaster):
-    name: str
-
-    def tick(self, clock: Clock) -> None:
-
-        # we are explicity calling base class tick
-        # instead of using super().tick because
-        # we do not want to call super() in base
-        # classes as they derive from an abstract base
-        # called Tickable which raises NotImplemented in tick()
-        # plus we define our own ordering instead of python's
-        # inheritance MRO (method resolution ordering)
-        Attackable.tick(self, clock)
-        SpellCaster.tick(self, clock)

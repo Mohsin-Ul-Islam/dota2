@@ -8,7 +8,8 @@ from pygame.locals import *
 from dota2.clock import Clock
 from dota2.damage import Damage
 from dota2.debuffs import BlighStoneDebuff, SpiritVesselDebuff
-from dota2.mixins import Hero, Movable, Tickable
+from dota2.mixins import Movable, Tickable
+from dota2.units import Hero
 from dota2.utils import Point3D
 
 
@@ -156,13 +157,17 @@ while True:
             )
 
         if event.type == KEYDOWN and event.key == K_s:
-            debuffs.append(
-                SpiritVesselDebuff(target=dragon_knight, duration=random.randint(1, 4))
+            dragon_knight.add_debuff(
+                SpiritVesselDebuff(
+                    stackable=False, target=dragon_knight, duration=random.randint(1, 4)
+                )
             )
 
         if event.type == KEYDOWN and event.key == K_b:
-            debuffs.append(
-                BlighStoneDebuff(target=dragon_knight, duration=random.randint(2, 6))
+            dragon_knight.add_debuff(
+                BlighStoneDebuff(
+                    stackable=False, target=dragon_knight, duration=random.randint(2, 6)
+                )
             )
 
     # display surface
@@ -239,12 +244,6 @@ while True:
 
     # tick the fps clock by 30 fps
     fps_clock.tick(30)
-
-    for debuff in debuffs:
-
-        debuff.tick(clock=clock)
-        if debuff.is_expired():
-            debuffs.remove(debuff)
 
     for hero in heroes:
         hero.tick(clock=clock)

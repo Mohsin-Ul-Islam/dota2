@@ -1,5 +1,6 @@
 from abc import abstractmethod
 from dataclasses import dataclass, field
+from typing import List
 
 from dota2.clock import Clock
 from dota2.mixins import Attackable, Movable, Tickable
@@ -7,51 +8,99 @@ from dota2.utils import logger
 
 
 @dataclass
-class TimedDebuff(Tickable):
+class Debuff(Tickable):
+    """Abstract base class for debuffs."""
+
+    stackable: bool
+
+    @abstractmethod
+    def on_start(self) -> None:
+        """Debuff lifecycle hook when the debuff is applied."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def on_end(self) -> None:
+        """Debuff lifecycle hook when the debuff ends."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def is_expired(self) -> bool:
+        """Is the debuff valid?"""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def reset(self) -> None:
+        """Restart the debuff as if applied fresh."""
+        raise NotImplementedError()
+
+
+@dataclass
+class Debuffable(Attackable):
+    """An object that can be debuffed."""
+
+    debuffs: List[Debuff] = field(default_factory=list)
+
+    def add_debuff(self, debuff: Debuff) -> None:
+        """Apply debuff on the target."""
+
+        if debuff.stackable:
+            debuff.on_start()
+            return self.debuffs.append(debuff)
+
+        for existing_debuff in self.debuffs:
+            if isinstance(debuff, type(existing_debuff)):
+                return existing_debuff.reset()
+
+        debuff.on_start()
+        self.debuffs.append(debuff)
+
+    def tick(self, clock: Clock) -> None:
+        for debuff in self.debuffs:
+            debuff.tick(clock=clock)
+            if debuff.is_expired():
+                self.debuffs.remove(debuff)
+
+        Attackable.tick(self, clock=clock)
+
+
+@dataclass
+class TimedDebuff(Debuff):
+    """Debuff that live for a duration."""
 
     duration: float
     duration_left: float = field(init=False)
 
     def __post_init__(self) -> None:
-
         self.duration_left = self.duration
-        self.before_start()
-
-    @abstractmethod
-    def before_start(self) -> None:
-        raise NotImplementedError()
-
-    @abstractmethod
-    def before_end(self) -> None:
-        raise NotImplementedError()
-
-    @abstractmethod
-    def on_tick(self) -> None:
-        raise NotImplementedError()
 
     def tick(self, clock: Clock) -> None:
 
         self.duration_left -= clock.elapsed()
         if self.is_expired():
-            return self.before_end()
+            return self.on_end()
 
         self.on_tick()
 
     def is_expired(self) -> bool:
         return self.duration_left <= 0
 
+    def reset(self) -> None:
+        logger.debug(f"Debuff resets on {id(self)} to {self.duration}s")
+        self.duration_left = self.duration
+
 
 @dataclass
 class SpiritVesselDebuff(TimedDebuff):
+    """Spirit vessel debuff."""
 
     target: Attackable
     _health_regen_change: float = field(init=False, default=0)
 
-    def before_start(self) -> None:
+    def on_start(self) -> None:
         logger.debug(f"Applied spirit vessel on {id(self.target)} for {self.duration}s")
         self.on_tick()
 
-    def before_end(self) -> None:
+    def on_end(self) -> None:
         logger.debug(f"Spirit vessel ends on {id(self.target)} after {self.duration}s")
         self.target.effective_health_regen_rate += self._health_regen_change
 
@@ -64,33 +113,35 @@ class SpiritVesselDebuff(TimedDebuff):
 
 @dataclass
 class BlighStoneDebuff(TimedDebuff):
+    """Blight stone debuff."""
 
     target: Attackable
     _armour_change: float = field(init=False, default=2)
 
-    def before_start(self) -> None:
+    def on_start(self) -> None:
         logger.debug(f"Applied blight stone to {id(self.target)} for {self.duration}s")
         self.target.armour -= self._armour_change
 
-    def before_end(self) -> None:
+    def on_end(self) -> None:
         logger.debug(f"Blight stone ends on {id(self.target)} after {self.duration}s")
         self.target.armour += self._armour_change
 
     def on_tick(self) -> None:
-        pass
+        super().tick.__doc__
 
 
 @dataclass
 class OrbOfVenomDebuff(TimedDebuff):
+    """Orb of venom debuff."""
 
     target: Movable
     _move_speed_change: float = field(init=False)
 
-    def before_start(self) -> None:
+    def on_start(self) -> None:
         self._move_speed_change = self.target.movement_speed * 0.13
         self.target.movement_speed -= self._move_speed_change
 
-    def before_end(self) -> None:
+    def on_end(self) -> None:
         self.target.movement_speed += self._move_speed_change
 
     def on_tick(self) -> None:
