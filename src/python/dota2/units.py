@@ -2,11 +2,11 @@ from dataclasses import dataclass, field
 
 from dota2.clock import Clock
 from dota2.debuffs import Debuffable
-from dota2.mixins import SpellCaster
+from dota2.mixins import SpellCaster, StatusEffectable
 
 
 @dataclass
-class Hero(Debuffable, SpellCaster):
+class Hero(StatusEffectable, Debuffable, SpellCaster):
     name: str = field(default="Unknown")
 
     def tick(self, clock: Clock) -> None:

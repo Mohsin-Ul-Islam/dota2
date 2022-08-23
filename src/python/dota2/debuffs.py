@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from typing import List
 
 from dota2.clock import Clock
-from dota2.mixins import Attackable, Movable, Tickable
+from dota2.mixins import Attackable, Movable, StatusEffectable, Tickable
 from dota2.utils import logger
 
 
@@ -127,7 +127,7 @@ class BlighStoneDebuff(TimedDebuff):
         self.target.armour += self._armour_change
 
     def on_tick(self) -> None:
-        super().tick.__doc__
+        pass
 
 
 @dataclass
@@ -143,6 +143,60 @@ class OrbOfVenomDebuff(TimedDebuff):
 
     def on_end(self) -> None:
         self.target.movement_speed += self._move_speed_change
+
+    def on_tick(self) -> None:
+        pass
+
+
+@dataclass
+class SilenceDebuff(TimedDebuff):
+    """Silences a target for a given duration."""
+
+    target: StatusEffectable
+
+    def on_start(self) -> None:
+        logger.debug(f"silenced {id(self)} for {self.duration}s")
+        self.target.add_effect(StatusEffectable.Effect.SILENCE)
+
+    def on_end(self) -> None:
+        logger.debug(f"silence ended on {id(self)} after {self.duration}s")
+        self.target.remove_effect(StatusEffectable.Effect.SILENCE)
+
+    def on_tick(self) -> None:
+        pass
+
+
+@dataclass
+class MuteDebuff(TimedDebuff):
+    """Mutes a target for a given duration."""
+
+    target: StatusEffectable
+
+    def on_start(self) -> None:
+        logger.debug(f"muted {id(self)} for {self.duration}s")
+        self.target.add_effect(StatusEffectable.Effect.MUTE)
+
+    def on_end(self) -> None:
+        logger.debug(f"mute ended on {id(self)} after {self.duration}s")
+        self.target.remove_effect(StatusEffectable.Effect.MUTE)
+
+    def on_tick(self) -> None:
+        pass
+
+
+@dataclass
+class StunDebuff(TimedDebuff):
+    """Stuns a target for a given duration."""
+
+    target: StatusEffectable
+
+    def on_start(self) -> None:
+        logger.debug(f"stunned {id(self)} for {self.duration}s")
+        self.target.add_effect(StatusEffectable.Effect.STUN)
+
+    def on_end(self) -> None:
+        logger.debug(f"stun ended on {id(self)} after {self.duration}s")
+        self.target.remove_effect(StatusEffectable.Effect.STUN)
 
     def on_tick(self) -> None:
         pass

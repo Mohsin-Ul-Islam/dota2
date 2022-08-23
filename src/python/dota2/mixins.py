@@ -1,8 +1,12 @@
 from dataclasses import dataclass, field
+from enum import Enum
+from typing import Set
 
 from dota2.base import Tickable
 from dota2.clock import Clock
 from dota2.damage import Damage
+
+# from dota2.spells import Castable
 from dota2.utils import Point3D, logger
 
 
@@ -74,12 +78,38 @@ class Movable(Tickable):
 
 
 @dataclass
+class Spell(Tickable):
+    mana: float
+    health: float
+    cooldown: float
+    # target: Castable | None = field(default=None)
+    cooldown_left: float = field(init=False, default=0)
+
+    def tick(self, clock: Clock) -> None:
+
+        self.cooldown_left = min(0, self.cooldown_left - clock.elapsed())
+        if self.is_on_cooldown():
+            return
+
+    # def set_target(self, target: Castable) -> None:
+    #     self.target = target
+
+    def is_on_cooldown(self) -> bool:
+        return self.cooldown_left > 0
+
+    def is_not_on_cooldown(self) -> bool:
+        return not self.is_on_cooldown()
+
+
+@dataclass
 class SpellCaster(Tickable):
     """An object that can cast active spells."""
 
     mana: float
     mana_pool: float
     mana_regeneration_rate: float
+
+    # spells: Dict[Type[Spell], Spell] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
 
@@ -100,3 +130,58 @@ class SpellCaster(Tickable):
             self.mana_pool,
             self.mana + clock.elapsed() * self.mana_regeneration_rate,
         )
+
+        # for spell in self.spells.values():
+        #     spell.tick(clock=clock)
+
+    # def cast(self, spell: Type[Spell], target: Castable) -> None:
+
+    #     spell_ = self.spells[spell]
+    #     if self.mana >= spell_.mana and spell_.is_not_on_cooldown():
+    #         spell_.set_target(target)
+    #         self.mana -= spell_.mana
+
+
+@dataclass
+class StatusEffectable:
+    """An object that can have status effects."""
+
+    class Effect(Enum):
+        """Enumeration of status effects."""
+
+        STUN = "STUN"
+        MUTE = "MUTE"
+        ROOT = "ROOT"
+        BREAK = "BREAK"
+        SILENCE = "SILENCE"
+
+    resistence: float = field(default=0)
+    effects: Set[Effect] = field(default_factory=set)
+
+    def add_effect(self, effect: Effect) -> None:
+        """Add status effect to the target."""
+        self.effects.add(effect)
+
+    def remove_effect(self, effect: Effect) -> None:
+        """Remove a status effect from target."""
+        self.effects.remove(effect)
+
+    def is_silenced(self) -> bool:
+        """Is the target silenced?"""
+        return StatusEffectable.Effect.SILENCE in self.effects
+
+    def is_stunned(self) -> bool:
+        """Is the target stunned?"""
+        return StatusEffectable.Effect.STUN in self.effects
+
+    def is_broken(self) -> bool:
+        """Is the target broken?"""
+        return StatusEffectable.Effect.BREAK in self.effects
+
+    def is_rooted(self) -> bool:
+        """Is the target rooted?"""
+        return StatusEffectable.Effect.ROOT in self.effects
+
+    def is_muted(self) -> bool:
+        """Is the target muted?"""
+        return StatusEffectable.Effect.MUTE in self.effects

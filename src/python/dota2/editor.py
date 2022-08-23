@@ -7,7 +7,14 @@ from pygame.locals import *
 
 from dota2.clock import Clock
 from dota2.damage import Damage
-from dota2.debuffs import BlighStoneDebuff, SpiritVesselDebuff
+from dota2.debuffs import (
+    BlighStoneDebuff,
+    MuteDebuff,
+    SilenceDebuff,
+    SpiritVesselDebuff,
+    StunDebuff,
+    TimedDebuff,
+)
 from dota2.mixins import Movable, Tickable
 from dota2.units import Hero
 from dota2.utils import Point3D
@@ -111,6 +118,7 @@ dragon_knight = Hero(
     mana=173,
     mana_pool=230,
     mana_regeneration_rate=1.1,
+    resistence=0,
 )
 walking_animation = Animation(tileset=walking_tileset, delay=0.1)
 standing_animation = Animation(tileset=standing_tileset, delay=0.1)
@@ -156,10 +164,40 @@ while True:
                 Damage(value=random.randint(54, 72), type_=Damage.Type.PHYSICAL)
             )
 
-        if event.type == KEYDOWN and event.key == K_s:
+        if event.type == KEYDOWN and event.key == K_v:
             dragon_knight.add_debuff(
                 SpiritVesselDebuff(
                     stackable=False, target=dragon_knight, duration=random.randint(1, 4)
+                )
+            )
+
+        if event.type == KEYDOWN and event.key == K_s:
+
+            dragon_knight.add_debuff(
+                SilenceDebuff(
+                    stackable=False,
+                    target=dragon_knight,
+                    duration=random.randint(1, 4),
+                )
+            )
+
+        if event.type == KEYDOWN and event.key == K_m:
+
+            dragon_knight.add_debuff(
+                MuteDebuff(
+                    stackable=False,
+                    target=dragon_knight,
+                    duration=random.randint(1, 4),
+                )
+            )
+
+        if event.type == KEYDOWN and event.key == K_t:
+
+            dragon_knight.add_debuff(
+                StunDebuff(
+                    stackable=False,
+                    target=dragon_knight,
+                    duration=random.randint(1, 4),
                 )
             )
 
@@ -185,6 +223,52 @@ while True:
     #     pos_x=screen_width / 2, pos_y=screen_height / 2, attackable=dragon_knight
     # )
     # display.blit(widget.surface(), (10, 10))
+
+    # status effect bar
+    bars_starting_y = 20
+    bars_current_y = bars_starting_y
+    for debuff in dragon_knight.debuffs:
+
+        if not isinstance(debuff, TimedDebuff):
+            continue
+
+        pygame.draw.rect(
+            display,
+            (255, 255, 255),
+            (screen_width / 2 - 50, bars_current_y, 100, 10),
+        )
+
+        pygame.draw.rect(
+            display,
+            (255, 0, 0),
+            (
+                screen_width / 2 - 50,
+                bars_current_y,
+                debuff.duration_left / debuff.duration * 100,
+                10,
+            ),
+        )
+
+        debuff_name = ""
+        if isinstance(debuff, SilenceDebuff):
+            debuff_name = "SILENCE"
+        elif isinstance(debuff, MuteDebuff):
+            debuff_name = "MUTE"
+        elif isinstance(debuff, StunDebuff):
+            debuff_name = "STUN"
+        elif isinstance(debuff, SpiritVesselDebuff):
+            debuff_name = "Spirit vessel"
+        elif isinstance(debuff, BlighStoneDebuff):
+            debuff_name = "Blight stone"
+
+        status_text = f"{debuff_name} {round(debuff.duration_left)}s"
+        status_text_surface = font.render(status_text, True, (255, 255, 255))
+        display.blit(
+            status_text_surface,
+            (screen_width / 2 - len(status_text) / 2 * 8, bars_current_y + 14),
+        )
+
+        bars_current_y += 50
 
     health_ratio = dragon_knight.health / dragon_knight.health_pool * 100
     mana_ratio = dragon_knight.mana / dragon_knight.mana_pool * 100
