@@ -5,6 +5,7 @@ from typing import List
 from dota2.clock import Clock
 from dota2.mixins import Attackable, Movable, StatusEffectable, Tickable
 from dota2.utils import logger
+from python.dota2.clock import Clock
 
 
 @dataclass
@@ -87,6 +88,15 @@ class TimedDebuff(Debuff):
     def reset(self) -> None:
         logger.debug(f"Debuff resets on {id(self)} to {self.duration}s")
         self.duration_left = self.duration
+
+@dataclass
+class ProximityDebuff(Debuff):
+    """Debuff that works in a certain proximity"""
+
+    proximity_radius: float
+
+    def tick(self, clock: Clock) -> None:
+        pass
 
 
 @dataclass
@@ -200,3 +210,8 @@ class StunDebuff(TimedDebuff):
 
     def on_tick(self) -> None:
         pass
+
+
+@dataclass
+class RadianceDebuff(ProximityDebuff):
+    pass
