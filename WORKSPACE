@@ -35,6 +35,20 @@ http_archive(
 )
 
 http_archive(
+    name = "rules_rust",
+    patches = ["@gazelle_rust//patches:rules_rust.patch"],
+    sha256 = "6357de5982dd32526e02278221bb8d6aa45717ba9bbacf43686b130aa2c72e1e",
+    urls = ["https://github.com/bazelbuild/rules_rust/releases/download/0.30.0/rules_rust-v0.30.0.tar.gz"],
+)
+
+http_archive(
+    name = "gazelle_rust",
+    sha256 = "3cfa91187390f3bbc1bf57d5d381fe2cd42d6018eae6ce76b85b012bdc39fed2",
+    strip_prefix = "gazelle_rust-main",
+    url = "https://github.com/Calsign/gazelle_rust/archive/refs/heads/main.zip",
+)
+
+http_archive(
     name = "rules_python_gazelle_plugin",
     sha256 = "9d04041ac92a0985e344235f5d946f71ac543f1b1565f2cdbc9a2aaee8adf55b",
     strip_prefix = "rules_python-0.26.0/gazelle",
@@ -59,6 +73,15 @@ go_rules_dependencies()
 go_register_toolchains(version = "1.20.5")
 
 gazelle_dependencies()
+
+load("@rules_rust//rust:repositories.bzl", "rules_rust_dependencies", "rust_register_toolchains")
+
+rules_rust_dependencies()
+
+rust_register_toolchains(
+    edition = "2021",
+    versions = ["1.71.0"],
+)
 
 load("@rules_python//python:repositories.bzl", "py_repositories", "python_register_toolchains")
 
@@ -85,3 +108,24 @@ install_deps()
 load("@rules_python_gazelle_plugin//:deps.bzl", _py_gazelle_deps = "gazelle_deps")
 
 _py_gazelle_deps()
+
+load("@gazelle_rust//:deps1.bzl", "gazelle_rust_dependencies1")
+
+gazelle_rust_dependencies1()
+
+load("@gazelle_rust//:deps2.bzl", "gazelle_rust_dependencies2")
+
+gazelle_rust_dependencies2()
+
+load("@rules_rust//crate_universe:defs.bzl", "crates_repository")
+
+crates_repository(
+    name = "crate_index",
+    lockfile = "//third_party/rust:Cargo.bazel.lock",
+    manifests = ["//third_party/rust:Cargo.toml"],
+    cargo_lockfile = "//third_party/rust:Cargo.lock",
+)
+
+load("@crate_index//:defs.bzl", "crate_repositories")
+
+crate_repositories()
