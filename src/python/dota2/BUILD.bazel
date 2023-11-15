@@ -1,0 +1,109 @@
+load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
+
+py_library(
+    name = "dota2",
+    srcs = [
+        "__init__.py",
+        "base.py",
+        "clock.py",
+        "damage.py",
+        "debuffs.py",
+        "mixins.py",
+        "units.py",
+        "utils.py",
+    ],
+    imports = [".."],
+    visibility = ["//src/python:__subpackages__"],
+)
+
+py_binary(
+    name = "dota2_bin",
+    srcs = ["__main__.py"],
+    imports = [".."],
+    main = "__main__.py",
+    visibility = ["//src/python:__subpackages__"],
+    deps = [
+        ":dota2",
+        "@pip_pygame//:pkg",
+    ],
+)
+
+py_library(
+    name = "conftest",
+    testonly = True,
+    srcs = ["conftest.py"],
+    imports = [".."],
+    visibility = ["//src/python:__subpackages__"],
+    deps = [
+        ":dota2",
+        "@pip_pytest//:pkg",
+    ],
+)
+
+py_test(
+    name = "test_attackable",
+    srcs = ["test_attackable.py"],
+    imports = [".."],
+    deps = [
+        ":conftest",
+        ":dota2",
+        "@pip_expects//:pkg",
+        "@pip_pytest//:pkg",
+    ],
+)
+
+py_test(
+    name = "test_clock",
+    srcs = ["test_clock.py"],
+    imports = [".."],
+    deps = [
+        ":conftest",
+        ":dota2",
+        "@pip_expects//:pkg",
+    ],
+)
+
+py_test(
+    name = "test_damage",
+    srcs = ["test_damage.py"],
+    imports = [".."],
+    deps = [
+        ":conftest",
+        ":dota2",
+        "@pip_expects//:pkg",
+    ],
+)
+
+py_test(
+    name = "test_debuffs",
+    srcs = ["test_debuffs.py"],
+    imports = [".."],
+    deps = [
+        ":conftest",
+        ":dota2",
+        "@pip_expects//:pkg",
+    ],
+)
+
+py_test(
+    name = "test_spell_caster",
+    srcs = ["test_spell_caster.py"],
+    imports = [".."],
+    deps = [
+        ":conftest",
+        ":dota2",
+        "@pip_expects//:pkg",
+        "@pip_pytest//:pkg",
+    ],
+)
+
+py_test(
+    name = "test_version",
+    srcs = ["test_version.py"],
+    imports = [".."],
+    deps = [
+        ":conftest",
+        ":dota2",
+        "@pip_expects//:pkg",
+    ],
+)

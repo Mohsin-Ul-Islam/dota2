@@ -1,0 +1,19 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
+
+go_library(
+    name = "dota2_lib",
+    srcs = ["main.go"],
+    importpath = "dota2/dota2",
+    visibility = ["//visibility:private"],
+)
+
+go_binary(
+    name = "dota2",
+    embed = [":dota2_lib"],
+    visibility = ["//visibility:public"],
+)
+
+go_test(
+    name = "dota2_test",
+    srcs = ["main_test.go"],
+)

@@ -5,7 +5,7 @@ from typing import List
 from dota2.clock import Clock
 from dota2.mixins import Attackable, Movable, StatusEffectable, Tickable
 from dota2.utils import logger
-from python.dota2.clock import Clock
+from dota2.clock import Clock
 
 
 @dataclass
